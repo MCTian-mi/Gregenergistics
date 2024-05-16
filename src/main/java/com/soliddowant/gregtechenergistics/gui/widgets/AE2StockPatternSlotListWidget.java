@@ -12,6 +12,7 @@ import gregtech.api.util.Size;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -134,19 +135,19 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
 
             //
-            this.addWidget(new ImageWidget(0, 0, 80, 80, Textures.BACKGROUND_CONFIG));
-            this.addWidget(new ImageWidget(24, 33, 7, 14, Textures.STOCK_CONFIG));
+            this.addWidget(new ImageWidget(0, 0, 80, 80, Textures.MUI2_PATTERN_CONFIG_BACKGROUND));
+            this.addWidget(new ImageWidget(24, 33, 7, 14, Textures.STOCK_CONFIG_ARROW));
             this.addWidget(new ImageWidget(50, 37, 5, 6, Textures.STOCK_ARROW));
 
             //
             this.circuitSlotWidget = new GhostCircuitSlotWidget(circuitInventory, 0, 6, 31);
             this.circuitSlotWidget.setBackgroundTexture(GuiTextures.SLOT, GuiTextures.INT_CIRCUIT_OVERLAY);
-            this.circuitSlotWidget.setConsumer(widget -> widget.setTooltipText("1")); // TODO: Add tooltip
+            this.circuitSlotWidget.setConsumer(widget -> widget.setTooltipText("gregtech.gui.pattern_configurator_slot.tooltip", getCircuitSlotTooltip(circuitInventory)));
             this.addWidget(this.circuitSlotWidget);
 
             //
             this.stockSlotWidget = new PhantomSlotWidget(ghostItemHandler, i, 56, 31);
-            this.stockSlotWidget.setBackgroundTexture(GuiTextures.SLOT, Textures.STOCK_OVERLAY);
+            this.stockSlotWidget.setBackgroundTexture(GuiTextures.SLOT, Textures.STOCK_OVERLAY).setTooltipText("gregtech.gui.pattern_stock_item.tooltip");
             this.addWidget(this.stockSlotWidget);
 
             //
@@ -156,6 +157,16 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
             //
             this.lowerBondConfigWidgetGroup = new BoundaryConfigWidgetGroup(this, 6, 56, lowerBoundConsumer, lowerBoundSupplier, lowerBoundSetter);
             this.addWidget(this.lowerBondConfigWidgetGroup);
+        }
+
+        protected String getCircuitSlotTooltip(GhostCircuitItemStackHandler circuitInventory) {
+            String configString;
+            if (circuitInventory == null || circuitInventory.getCircuitValue() == GhostCircuitItemStackHandler.NO_CONFIG) {
+                configString = new TextComponentTranslation("gregtech.gui.configurator_slot.no_value").getFormattedText();
+            } else {
+                configString = String.valueOf(circuitInventory.getCircuitValue());
+            }
+           return configString;
         }
 
         @Override
@@ -218,7 +229,7 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
                 public TextlessIncrementButtonWidget(int x, int y, int width, int height, boolean isIncreaseButton, IntConsumer updater) {
                     super(x, y, width, height, isIncreaseButton ? 1 : -1, isIncreaseButton ? 16 : -16, isIncreaseButton ? 32 : -32, isIncreaseButton ? 64 : -64, updater);
-                    this.setButtonTexture(isIncreaseButton ? Textures.BUTTON_R : Textures.BUTTON_L).setTextScale(0F).setDefaultTooltip().setShouldClientCallback(false);
+                    this.setButtonTexture(isIncreaseButton ? Textures.BUTTON_ANGLE_R : Textures.BUTTON_ANGLE_L).setTextScale(0F).setDefaultTooltip().setShouldClientCallback(false);
                 }
             }
         }

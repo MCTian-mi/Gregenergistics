@@ -45,7 +45,7 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
         // Create the config button
         this.configButton = new ClickButtonWidget(13, -1, 6, 6, "", clickData -> {
             this.toggleConfigVisible();
-        }).setButtonTexture(Textures.BUTTON_CONFIG).setShouldClientCallback(true);
+        }).setButtonTexture(Textures.BUTTON_OPEN_PATTERN_CONFIG).setShouldClientCallback(true);
         this.configButton.setVisible(false);
         this.addWidget(this.configButton);
     }

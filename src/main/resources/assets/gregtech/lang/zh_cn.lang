@@ -1,0 +1,14 @@
+metaitem.ae2_stocker.name=AE2备料覆盖版
+metaitem.ae2_stocker.tooltip=别用它囤积化学品好吗？
+gregtech.gui.pattern_configurator_slot.tooltip=§f在此处设置此备料配方所需的编程电路配置§r/n§a当前配置：§f%d§7/n/n§7左/右键或滑动滚轮以在列表中循环/n§7Shift-右键以清除配置
+gregtech.gui.pattern_stock_item.tooltip=§f在此处设置目标备料物品
+cover.stocker.status=当前状态：%s
+cover.stocker.status.running=备料中
+cover.stocker.status.other_disabled=被其他覆盖版禁用
+cover.stocker.status.pattern_not_inserted=缺少样板或配置不正确
+cover.stocker.status.grid_disconnected=未连接网络
+cover.stocker.status.fully_stocked=备料结束
+cover.stocker.status.missing_inputs=缺少输入
+cover.stocker.status.invalid_multiblock=多方块存在问题
+cover.stocker.status.missing_input_space=无法输入原料
+cover.stocker.status.missing_output_space=无法输出产物

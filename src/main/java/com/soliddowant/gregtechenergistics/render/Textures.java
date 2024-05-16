@@ -15,24 +15,22 @@ import java.util.List;
 public class Textures {
     public static List<TextureUtils.IIconRegister> iconRegisters = new ArrayList<>();
 
-    public static SimpleOverlayRenderer MACHINE_STATUS_OVERLAY = new ModOverlayRenderer("overlay/machine/overlay_status");
-//    public static SimpleOverlayRenderer AE2_STOCKER = new ModOverlayRenderer("overlay/machine/overlay_status");
-    public static SimpleOverlayRenderer STOCKER_OVERLAY = new ModOverlayRenderer("overlay/machine/overlay_stocker");
-
     public static ResourceLocation AE2SpriteMap = new ResourceLocation(AppEng.MOD_ID,"textures/guis/states.png");
 
-    public static final TextureArea STOCK_OVERLAY = TextureArea.fullImage("textures/gui/widget/stock_overlay.png");
-    public static final TextureArea STOCK_ARROW = TextureArea.fullImage("textures/gui/widget/arrow_stocker.png");
-    public static final TextureArea STOCK_CONFIG = TextureArea.fullImage("textures/gui/widget/int_config_stocker.png");
-    public static final TextureArea BUTTON_L = TextureArea.fullImage("textures/gui/widget/button_l.png");
-    public static final TextureArea BUTTON_R = TextureArea.fullImage("textures/gui/widget/button_r.png");
-    public static final TextureArea BUTTON_CONFIG = TextureArea.fullImage("textures/gui/widget/button_config.png");
-    public static final TextureArea BACKGROUND = TextureArea.fullImage("textures/gui/ae2_stocker_gui.png");
-    public static final TextureArea BACKGROUND_CONFIG = TextureArea.fullImage("textures/gui/ae2_stocker_config_gui.png");
-    public static final TextureArea PATTERN_OVERLAY = TextureArea.fullImage("textures/gui/widget/pattern_overlay.png");
+    public static final TextureArea MUI2_BACKGROUND = TextureArea.fullImage("textures/gui/base/background_mui2.png");
+    public static final TextureArea MUI2_PATTERN_CONFIG_BACKGROUND = TextureArea.fullImage("textures/gui/base/background_mui2_pattern_config.png");
+    public static final TextureArea BUTTON_ANGLE_L = TextureArea.fullImage("textures/gui/widget/button_angle_l.png");
+    public static final TextureArea BUTTON_ANGLE_R = TextureArea.fullImage("textures/gui/widget/button_angle_r.png");
+    public static final TextureArea BUTTON_OPEN_PATTERN_CONFIG = TextureArea.fullImage("textures/gui/widget/button_open_pattern_config.png");
+    public static final TextureArea PATTERN_OVERLAY = TextureArea.fullImage("textures/gui/overlay/pattern_overlay.png");
+    public static final TextureArea STOCK_OVERLAY = TextureArea.fullImage("textures/gui/overlay/stock_overlay.png");
+    public static final TextureArea STOCK_ARROW = TextureArea.fullImage("textures/gui/arrows/arrow_stocker.png");
+    public static final TextureArea STOCK_CONFIG_ARROW = TextureArea.fullImage("textures/gui/arrows/int_config_stocker.png");
     public static final TextureArea AE2_STOCKER = TextureArea.fullImage("textures/items/metaitems/ae2_stocker.png");
-    public static final TextureArea STOCKER_ONLINE = TextureArea.fullImage("textures/gui/widget/ae2_stocker_online.png");
-    public static final TextureArea STOCKER_OFFLINE = TextureArea.fullImage("textures/gui/widget/ae2_stocker_offline.png");
+    public static final TextureArea STOCKER_ONLINE = TextureArea.fullImage("textures/gui/widget/stocker_online.png");
+    public static final TextureArea STOCKER_OFFLINE = TextureArea.fullImage("textures/gui/widget/stocker_offline.png");
+    public static final SimpleOverlayRenderer STOCKER_COVER_ACTIVE = new SimpleOverlayRenderer("overlay/appeng/cover_ae2_stocker_active");
+    public static final SimpleOverlayRenderer STOCKER_COVER_INACTIVE = new SimpleOverlayRenderer("overlay/appeng/cover_ae2_stocker_inactive");
 
     @SideOnly(Side.CLIENT)
     public static void register(TextureMap textureMap) {

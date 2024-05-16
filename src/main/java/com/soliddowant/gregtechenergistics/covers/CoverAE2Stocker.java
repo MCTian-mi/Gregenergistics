@@ -60,6 +60,7 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
+import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.common.ConfigHolder;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockPart;
 import net.minecraft.client.resources.I18n;
@@ -131,7 +132,7 @@ public class CoverAE2Stocker extends CoverBase
 //    private final PatternHandler patternHandler = new PatternHandler(27);
 
     private int meUpdateTick;
-    protected boolean isOnline;
+    protected boolean isOnline = false;
     private AENetworkProxy aeProxy;
 
     private PatternStackHandler patternInventory = new PatternStackHandler(9);
@@ -467,10 +468,10 @@ public class CoverAE2Stocker extends CoverBase
     @Override
     public void renderCover(@NotNull CCRenderState renderState, @NotNull Matrix4 translation,
                             IVertexOperation[] pipeline, @NotNull Cuboid6 plateBox, @NotNull BlockRenderLayer layer) {
-        if (isOnline) {
-            gregtech.client.renderer.texture.Textures.ME_INPUT_BUS_ACTIVE.renderSided(getAttachedSide(), renderState, translation, pipeline);
+        if (this.isOnline) {
+            Textures.STOCKER_COVER_ACTIVE.renderSided(getAttachedSide(), plateBox, renderState, pipeline, translation);
         } else {
-            gregtech.client.renderer.texture.Textures.ME_INPUT_BUS.renderSided(getAttachedSide(), renderState, translation, pipeline);
+            Textures.STOCKER_COVER_INACTIVE.renderSided(getAttachedSide(), plateBox, renderState, pipeline, translation);
         }
     }
 
@@ -502,7 +503,7 @@ public class CoverAE2Stocker extends CoverBase
     @Override
     public ModularUI createUI(EntityPlayer player) {
         ModularUI.Builder builder = ModularUI
-                .builder(Textures.BACKGROUND, 176, 192);
+                .builder(Textures.MUI2_BACKGROUND, 176, 192);
 
         WidgetGroup labelWithIcon = new WidgetGroup();
 

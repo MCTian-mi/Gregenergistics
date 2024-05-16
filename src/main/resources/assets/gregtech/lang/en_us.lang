@@ -1,50 +1,14 @@
-metaitem.ae2_stocker.name=AE2 stocker cover
-metaitem.ae2_stocker.tooltip=Place holder
-cover.ae2_stocker.debug.is_online=Is online: %s
-cover.ae2_stocker.debug.has_node=Has node: %s
-
-
-
-metaitem.ae2_stocker_lv.name=AE2 stocker cover (LV)
-metaitem.ae2_stocker_lv.tooltip=1280 max stock count (as Cover)
-metaitem.ae2_stocker_mv.name=AE2 stocker cover (MV)
-metaitem.ae2_stocker_mv.tooltip=5120 max stock count (as Cover)
-metaitem.ae2_stocker_hv.name=AE2 stocker cover (HV)
-metaitem.ae2_stocker_hv.tooltip=20,480 max stock count (as Cover)
-metaitem.ae2_stocker_ev.name=AE2 stocker cover (EV)
-metaitem.ae2_stocker_ev.tooltip=81,920 max stock count (as Cover)
-metaitem.ae2_stocker_iv.name=AE2 stocker cover (IV)
-metaitem.ae2_stocker_iv.tooltip=327,680 max stock count (as Cover)
-metaitem.ae2_stocker_luv.name=AE2 stocker cover (LuV)
-metaitem.ae2_stocker_luv.tooltip=1,310,720 max stock count (as Cover)
-metaitem.ae2_stocker_zpm.name=AE2 stocker cover (ZPM)
-metaitem.ae2_stocker_zpm.tooltip=5,242,880 max stock count (as Cover)
-metaitem.ae2_stocker_uv.name=AE2 stocker cover (UV)
-metaitem.ae2_stocker_uv.tooltip=20,971,520 max stock count (as Cover)
-cover.stocker.title=AE2 Stocker Cover Settings (%s)
-cover.stocker.pattern.title=Crafting pattern
-cover.stocker.stock_count=%s items
-cover.stocker.status=Status: %s
+metaitem.ae2_stocker.name=AE2 Stocker Cover
+metaitem.ae2_stocker.tooltip=Don't stock chemicals with it, ok?
+gregtech.gui.pattern_configurator_slot.tooltip=§fAdjust this to setup the circuit configuration of the stocking recipe§r/n§aConfigured Value: §f%d§7/n/n§7LMB/RMB/Scroll to cycle through the list/n§7Shift-right-click to clear
+gregtech.gui.pattern_stock_item.tooltip=§fSet which item you want to stock here
+cover.stocker.status=Currrent status: %s
 cover.stocker.status.running=Running
 cover.stocker.status.other_disabled=Disabled by other cover
-cover.stocker.status.pattern_not_inserted=Missing pattern
+cover.stocker.status.pattern_not_inserted=Missing pattern or configured incorrectly
 cover.stocker.status.grid_disconnected=Connection problem
 cover.stocker.status.fully_stocked=Fully stocked
 cover.stocker.status.missing_inputs=Missing inputs
 cover.stocker.status.invalid_multiblock=Multiblock problem
 cover.stocker.status.missing_input_space=Missing input space
 cover.stocker.status.missing_output_space=Missing output space
-cover.stocker.fluids.enable=Fluids enabled
-cover.stocker.fluids.disable=Fluids disabled
-cover.stocker.output.enable=Output enabled
-cover.stocker.output.disable=Output disabled
-cover.stocker.upgrade.label=Crafting card
-
-gui.gregtech.terminal.stocker=Stocker Terminal
-gui.gregtech.terminal.inventory=Inventory
-
-metaitem.fluid_encoder.name=Fluid encoder
-metaitem.fluid_encoder.amount=%s mB
-metaitem.fluid_encoder.fluid=Fluid:
-
-metaitem.stocker_terminal.name=Stocker Terminal
