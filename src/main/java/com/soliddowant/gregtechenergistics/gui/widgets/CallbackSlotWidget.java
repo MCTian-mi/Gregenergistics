@@ -1,7 +1,6 @@
 package com.soliddowant.gregtechenergistics.gui.widgets;
 
 import gregtech.api.gui.Widget;
-import gregtech.api.gui.widgets.SlotWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -80,7 +79,7 @@ public class CallbackSlotWidget implements INBTSerializable<NBTTagCompound> {
         else
             onSlotRemoved();
         maybeCallChangedCallback();
-}
+    }
 
     @Nonnull
     public ItemStack getSlotStack() {

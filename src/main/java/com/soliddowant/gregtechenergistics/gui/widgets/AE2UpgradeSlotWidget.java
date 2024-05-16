@@ -3,7 +3,6 @@ package com.soliddowant.gregtechenergistics.gui.widgets;
 import appeng.api.config.Upgrades;
 import appeng.items.materials.ItemMaterial;
 import com.soliddowant.gregtechenergistics.render.Textures;
-import gregtech.api.gui.widgets.SlotWidget;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 

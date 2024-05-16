@@ -3,8 +3,7 @@ package com.soliddowant.gregtechenergistics.items.behaviors;
 import appeng.util.Platform;
 import appeng.util.ReadableNumberConverter;
 import com.soliddowant.gregtechenergistics.gui.ModularUIItemBuilder;
-import com.soliddowant.gregtechenergistics.items.MetaItems;
-import com.soliddowant.gregtechenergistics.items.StandardModMetaItem;
+import com.soliddowant.gregtechenergistics.items.GEMetaItem;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.ClickButtonWidget;
@@ -37,7 +36,7 @@ public class FluidEncoderBehaviour implements IItemBehaviour, ItemUIFactory {
         if(containedStack == null)
             return;
 
-        MetaItem<?>.MetaValueItem heldMetaItem = MetaItems.getMetaValueItemFromStack(stack);
+        MetaItem<?>.MetaValueItem heldMetaItem = ((MetaItem<?>) stack.getItem()).getItem(stack);
         String baseName = "metaitem." + heldMetaItem.unlocalizedName;
         lines.add(containedStack.getLocalizedName() + ", " +
                 I18n.format(baseName + ".amount", getFluidAmount(stack)));
@@ -62,7 +61,7 @@ public class FluidEncoderBehaviour implements IItemBehaviour, ItemUIFactory {
     @Override
     public ModularUI createUI(PlayerInventoryHolder holder, EntityPlayer entityPlayer) {
         ItemStack heldItemStack = holder.getCurrentItem();
-        MetaItem<?>.MetaValueItem heldMetaItem = MetaItems.getMetaValueItemFromStack(heldItemStack);
+        MetaItem<?>.MetaValueItem heldMetaItem = ((MetaItem<?>) heldItemStack.getItem()).getItem(heldItemStack);
         String baseName = "metaitem." + heldMetaItem.unlocalizedName;
 
         return new ModularUIItemBuilder(GuiTextures.BACKGROUND, 178, 240)
@@ -145,7 +144,7 @@ public class FluidEncoderBehaviour implements IItemBehaviour, ItemUIFactory {
 
     public static FluidEncoderBehaviour getStackBehaviour(ItemStack stack) {
         Item item = stack.getItem();
-        if(!(item instanceof StandardModMetaItem))
+        if(!(item instanceof GEMetaItem))
             return null;
 
         MetaItem<?>.MetaValueItem stackMetaValueItem = ((MetaItem<?>) item).getItem(stack);

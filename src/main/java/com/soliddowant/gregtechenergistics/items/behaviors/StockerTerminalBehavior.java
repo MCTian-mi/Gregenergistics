@@ -2,7 +2,6 @@ package com.soliddowant.gregtechenergistics.items.behaviors;
 
 import appeng.api.AEApi;
 import appeng.api.parts.IPart;
-import com.soliddowant.gregtechenergistics.GregTechEnergisticsMod;
 import com.soliddowant.gregtechenergistics.items.stats.IModelProvider;
 import com.soliddowant.gregtechenergistics.items.stats.IPartProvider;
 import com.soliddowant.gregtechenergistics.parts.StockerTerminalPart;
@@ -18,6 +17,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+
+import static gregtech.api.util.GTUtility.gregtechId;
 
 public class StockerTerminalBehavior implements IItemBehaviour, IPartProvider, IModelProvider {
     @Nonnull
@@ -38,6 +39,6 @@ public class StockerTerminalBehavior implements IItemBehaviour, IPartProvider, I
     @Override
     public ModelResourceLocation getModel() {
         AEApi.instance().registries().partModels().registerModels(StockerTerminalPart.MODELS);
-        return new ModelResourceLocation(GregTechEnergisticsMod.MODID + ":part/stocker.terminal");
+        return (ModelResourceLocation) gregtechId(":part/stocker.terminal");
     }
 }

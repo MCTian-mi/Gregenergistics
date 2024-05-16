@@ -5,8 +5,6 @@ import appeng.helpers.IContainerCraftingPacket;
 import appeng.util.Platform;
 import appeng.util.helpers.ItemHandlerUtil;
 import appeng.util.inv.WrapperInvItemHandler;
-import com.soliddowant.gregtechenergistics.items.MetaItems;
-import com.soliddowant.gregtechenergistics.items.behaviors.FluidEncoderBehaviour;
 import com.soliddowant.gregtechenergistics.networking.JEIPacket;
 import com.soliddowant.gregtechenergistics.networking.NetworkHandler;
 import mezz.jei.api.gui.IGuiIngredient;
@@ -198,10 +196,10 @@ public class RecipeTransferHandler implements IRecipeTransferHandler<ContainerPa
                 if (addedStackCount >= maxCount)
                     break;
 
-                ItemStack fluidEncoder = MetaItems.FLUID_ENCODER.getStackForm();
-                FluidEncoderBehaviour.setItemStackFluid(fluidEncoder, fluid);
-                FluidEncoderBehaviour.setItemStackFluidAmount(fluidEncoder, fluid.amount);
-                itemStacks.add(fluidEncoder);
+//                ItemStack fluidEncoder = GEMetaItem.FLUID_ENCODER.getStackForm();
+//                FluidEncoderBehaviour.setItemStackFluid(fluidEncoder, fluid);
+//                FluidEncoderBehaviour.setItemStackFluidAmount(fluidEncoder, fluid.amount);
+//                itemStacks.add(fluidEncoder);
                 addedStackCount++;
             }
 

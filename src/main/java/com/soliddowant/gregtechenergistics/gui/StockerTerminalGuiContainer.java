@@ -11,14 +11,12 @@ import appeng.client.me.SlotDisconnected;
 import appeng.util.Platform;
 import appeng.util.ReadableNumberConverter;
 import com.google.common.collect.HashMultimap;
-import com.soliddowant.gregtechenergistics.GregTechEnergisticsMod;
-import com.soliddowant.gregtechenergistics.parts.StockerTerminalPart;
 import com.soliddowant.gregtechenergistics.covers.CoverStatus;
+import com.soliddowant.gregtechenergistics.parts.StockerTerminalPart;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -27,6 +25,8 @@ import net.minecraft.world.World;
 
 import java.io.IOException;
 import java.util.*;
+
+import static gregtech.api.util.GTUtility.gregtechId;
 
 public class StockerTerminalGuiContainer extends AEBaseGui {
 	protected final int offsetX = 9;
@@ -51,11 +51,6 @@ public class StockerTerminalGuiContainer extends AEBaseGui {
 	}
 
 	@Override
-	public boolean MT_isIgnored(Slot slot) {
-		return false;
-	}
-
-	@Override
 	public void initGui() {
 		super.initGui();
 
@@ -74,9 +69,9 @@ public class StockerTerminalGuiContainer extends AEBaseGui {
 
 	@Override
 	public void drawFG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		this.fontRenderer.drawString(I18n.format("gui.gregtechenergistics.terminal.stocker"),
+		this.fontRenderer.drawString(I18n.format("gui.gregtech.terminal.stocker"),
 				8, 6, 4210752);
-		this.fontRenderer.drawString(I18n.format("gui.gregtechenergistics.terminal.inventory"),
+		this.fontRenderer.drawString(I18n.format("gui.gregtech.terminal.inventory"),
 				8, this.ySize - 96 + 3, 4210752);
 
 		final int ex = this.getScrollBar().getCurrentScroll();
@@ -126,7 +121,7 @@ public class StockerTerminalGuiContainer extends AEBaseGui {
 
 	@Override
 	public void bindTexture(String file) {
-		ResourceLocation loc = new ResourceLocation(GregTechEnergisticsMod.MODID, "textures/" + file);
+		ResourceLocation loc = gregtechId("textures/" + file);
 		this.mc.getTextureManager().bindTexture(loc);
 	}
 

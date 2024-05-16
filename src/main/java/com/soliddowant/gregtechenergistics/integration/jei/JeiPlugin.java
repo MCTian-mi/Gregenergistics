@@ -1,14 +1,13 @@
 package com.soliddowant.gregtechenergistics.integration.jei;
 
 import appeng.container.implementations.ContainerPatternTerm;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableTable;
-import mezz.jei.collect.Table;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.transfer.IRecipeTransferRegistry;
+import mezz.jei.collect.Table;
 import mezz.jei.config.Constants;
 import mezz.jei.recipes.RecipeTransferRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;

@@ -62,7 +62,7 @@ public class JEIPacket extends PacketCompressedNBT {
             tags.appendTag(serializer.apply(stack));
         }
 
-        if(tags.hasNoTags())
+        if(tags.isEmpty())
             return null;
 
         return tags;
@@ -86,7 +86,7 @@ public class JEIPacket extends PacketCompressedNBT {
 
     @Nullable
     protected <T> Collection<T> deserializeArray(@Nullable NBTTagList tags, @Nonnull Function<NBTTagCompound, T> deserializer) {
-        if(tags == null || tags.hasNoTags())
+        if(tags == null || tags.isEmpty())
             return null;
 
         LinkedList<T> extractedItems = new LinkedList<>();

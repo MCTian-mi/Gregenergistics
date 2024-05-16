@@ -17,12 +17,11 @@ import appeng.util.inv.WrapperCursorItemHandler;
 import appeng.util.inv.WrapperFilteredItemHandler;
 import appeng.util.inv.WrapperRangeItemHandler;
 import appeng.util.inv.filter.IAEItemFilter;
-import com.soliddowant.gregtechenergistics.networking.NetworkHandler;
-import com.soliddowant.gregtechenergistics.networking.PacketCompressedNBT;
-import com.soliddowant.gregtechenergistics.networking.PacketTerminal;
-import com.soliddowant.gregtechenergistics.parts.StockerTerminalPart;
 import com.soliddowant.gregtechenergistics.covers.CoverAE2Stocker;
 import com.soliddowant.gregtechenergistics.covers.CoverStatus;
+import com.soliddowant.gregtechenergistics.networking.NetworkHandler;
+import com.soliddowant.gregtechenergistics.networking.PacketTerminal;
+import com.soliddowant.gregtechenergistics.parts.StockerTerminalPart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -121,7 +120,7 @@ public class StockerTerminalContainer extends AEBaseContainer {
                         this.updateTagChildItems(data, inv, i, 1);
             }
 
-        if (data.hasNoTags())
+        if (data.isEmpty())
             return;
 
         // TODO maybe rework this so that PacketTerminal is passed actual business objects instead of serialized data
@@ -243,7 +242,7 @@ public class StockerTerminalContainer extends AEBaseContainer {
         final String name = getItemTagName(tracker);
         final NBTTagCompound tag = parentTag.getCompoundTag(name);
 
-        if (tag.hasNoTags()) {
+        if (tag.isEmpty()) {
             tag.setLong("sortBy", tracker.sortBy);
             tag.setString("un", tracker.unlocalizedName);
         }
@@ -273,7 +272,7 @@ public class StockerTerminalContainer extends AEBaseContainer {
     }
 
     protected void setItemTag(NBTTagCompound parent, NBTTagCompound child, InvTracker inv) {
-        if (child.hasNoTags())
+        if (child.isEmpty())
             return;
 
         parent.setTag(getItemTagName(inv), child);
@@ -310,7 +309,7 @@ public class StockerTerminalContainer extends AEBaseContainer {
             this.server = server;
             this.cover = cover;
             this.unlocalizedName = unlocalizedName;
-            BlockPos coverPosition = this.cover.coverHolder.getPos();
+            BlockPos coverPosition = this.cover.getCoverableView().getPos();
             this.sortBy = ((long) coverPosition.getZ() << 24) ^ ((long) coverPosition.getX() << 8) ^ coverPosition.getY();
         }
 

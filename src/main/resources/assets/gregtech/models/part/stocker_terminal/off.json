@@ -1,0 +1,8 @@
+{
+  "parent": "appliedenergistics2:part/display_off",
+  "textures": {
+    "lightsBright": "gregtech:parts/stocker_terminal_bright",
+    "lightsMedium": "gregtech:parts/stocker_terminal_medium",
+    "lightsDark": "gregtech:parts/stocker_terminal_dark"
+  }
+}

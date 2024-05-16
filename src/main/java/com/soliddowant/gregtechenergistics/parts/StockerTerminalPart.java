@@ -15,10 +15,12 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nonnull;
 
+import static gregtech.api.util.GTUtility.gregtechId;
+
 public class StockerTerminalPart extends AbstractPartDisplay {
     public static ResourceLocation[] MODELS = new ResourceLocation[]{
-            new ResourceLocation(GregTechEnergisticsMod.MODID, "part/stocker.terminal/on"),		// 0
-            new ResourceLocation(GregTechEnergisticsMod.MODID, "part/stocker.terminal/off"),	// 1
+            gregtechId("part/stocker.terminal/on"),    // 0
+            gregtechId("part/stocker.terminal/off"), // 1
     };
     public static final ResourceLocation MODEL_OFF = MODELS[1];
     public static final ResourceLocation MODEL_ON = MODELS[0];

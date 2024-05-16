@@ -4,7 +4,7 @@ import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Matrix4;
-import com.soliddowant.gregtechenergistics.GregTechEnergisticsMod;
+import gregtech.api.GTValues;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -29,7 +29,7 @@ public class ModOverlayRenderer extends SimpleOverlayRenderer {
     }
 
     public ModOverlayRenderer(String basePath) {
-        this(GregTechEnergisticsMod.MODID, basePath);
+        this(GTValues.MODID, basePath);
     }
 
     @Override

@@ -1,11 +1,12 @@
-[
-{
-  "modid": "gregtechenergistics",
-  "name": "GregTech Energistics",
-  "description": "AE2 integration with GTCE.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "authorList": ["solidDOWant"],
-  "credits": "GTCE, AE2, and Omnifactory teams"
-}
-]
+[{
+    "modid": "${modid}",
+    "name": "${modname}",
+    "description": "An example mod for Minecraft 1.12.2 with Forge",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "logoFile": "",
+    "url": "",
+    "authorList": [],
+    "credits": "",
+    "dependencies": []
+}]
