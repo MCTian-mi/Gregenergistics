@@ -1,9 +1,12 @@
 package com.soliddowant.gregtechenergistics.gui.widgets;
 
 import appeng.items.misc.ItemEncodedPattern;
+import com.glodblock.github.common.item.ItemFluidDrop;
+import com.glodblock.github.common.item.fake.FakeItemRegister;
 import com.soliddowant.gregtechenergistics.render.Textures;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.IRenderContext;
+import gregtech.api.gui.Widget;
 import gregtech.api.gui.impl.ModularUIGui;
 import gregtech.api.gui.resources.IGuiTexture;
 import gregtech.api.gui.widgets.AbstractWidgetGroup;
@@ -11,17 +14,23 @@ import gregtech.api.gui.widgets.BlockableSlotWidget;
 import gregtech.api.gui.widgets.ClickButtonWidget;
 import gregtech.api.util.Position;
 import gregtech.api.util.Size;
+import gregtech.api.util.TextFormattingUtil;
+import gregtech.client.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
+import java.util.function.Consumer;
 
 public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
 
@@ -43,11 +52,14 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
         this.addWidget(this.patternSlotWidget);
 
         // Create the config button
-        this.configButton = new ClickButtonWidget(13, -1, 6, 6, "", clickData -> {
+        this.configButton = new CustomClickButtonWidget(12, 0, 6, 6, "", clickData -> {
             this.toggleConfigVisible();
         }).setButtonTexture(Textures.BUTTON_OPEN_PATTERN_CONFIG).setShouldClientCallback(true);
         this.configButton.setVisible(false);
         this.addWidget(this.configButton);
+
+        //
+        this.patternSlotWidget.addLayeredWidget(this.configButton);
     }
 
     // Unique methods
@@ -81,9 +93,13 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
 
     @Nonnull
     public ItemStack getPattern() {
-        if(!hasPattern())
+        if (!hasPattern())
             return ItemStack.EMPTY;
         return this.patternSlotWidget.getHandle().getStack();
+    }
+
+    public void addLayeredWidget(Widget widget) {
+        this.patternSlotWidget.addLayeredWidget(widget);
     }
 
     // Overrides
@@ -109,12 +125,18 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
         protected AE2StockPatternSlotWidget parentWidget;
         protected int index;
 
+        protected NonNullList<Widget> layeredWidgets = NonNullList.create();
+
         public PatternSlotWidget(int i, AE2StockPatternSlotWidget parentWidget, IItemHandlerModifiable itemHandler,
                                  int slotIndex, int xPosition, int yPosition, boolean canTakeItems, boolean canPutItems) {
             super(itemHandler, slotIndex, xPosition, yPosition, canTakeItems, canPutItems);
             this.index = i;
             this.parentWidget = parentWidget;
             this.setBackgroundTexture(GuiTextures.SLOT, Textures.PATTERN_OVERLAY);
+        }
+
+        public void addLayeredWidget(Widget widget) {
+            this.layeredWidgets.add(widget);
         }
 
         @Override
@@ -139,6 +161,12 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
                 parentWidget.configButton.setVisible(true);
             }
         }
+
+        @Override
+        public boolean isMouseOverElement(int mouseX, int mouseY) {
+            return super.isMouseOverElement(mouseX, mouseY) && this.layeredWidgets.stream().noneMatch(widget -> widget.isVisible() && widget.isMouseOverElement(mouseX, mouseY));
+        }
+
 
         @Override
         @SideOnly(Side.CLIENT)
@@ -169,26 +197,43 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             if (!itemStack.isEmpty()) {
                 final ItemEncodedPattern pattern = (ItemEncodedPattern) itemStack.getItem();
                 final ItemStack out = pattern.getOutput(itemStack);
-                final ItemStack renderStack = out.isEmpty() ? itemStack : out;
-//            renderStack.setCount(1);
 
-                GlStateManager.enableBlend();
-                GlStateManager.enableDepth();
-                GlStateManager.disableRescaleNormal();
-                GlStateManager.disableLighting();
-                RenderHelper.disableStandardItemLighting();
-                RenderHelper.enableStandardItemLighting();
-                RenderHelper.enableGUIStandardItemLighting();
-                GlStateManager.pushMatrix();
-                RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
-                itemRender.renderItemAndEffectIntoGUI(renderStack, pos.x + 1, pos.y + 1);
-                itemRender.renderItemOverlayIntoGUI(Minecraft.getMinecraft().fontRenderer, renderStack, pos.x + 1, pos.y + 1,
-                        null);
-                GlStateManager.enableAlpha();
-                GlStateManager.popMatrix();
-                RenderHelper.disableStandardItemLighting();
+                if (out.getItem() instanceof ItemFluidDrop) {
+                    FluidStack fluidStack = FakeItemRegister.getStack(out);
+                    if (fluidStack != null) {
+                        GlStateManager.disableBlend();
+                        RenderUtil.drawFluidForGui(fluidStack, fluidStack.amount, pos.x + 1, pos.y + 1, size.width - 1,
+                                size.height - 1);
+                        GlStateManager.pushMatrix();
+                        GlStateManager.scale(0.5, 0.5, 1);
+                        String s = TextFormattingUtil.formatLongToCompactString(fluidStack.amount, 4) + "L";
+                        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+                        fontRenderer.drawStringWithShadow(s,
+                                (pos.x + (size.width / 3F)) * 2 - fontRenderer.getStringWidth(s) + 21,
+                                (pos.y + (size.height / 3F) + 6) * 2, 0xFFFFFF);
+                        GlStateManager.popMatrix();
+                        GlStateManager.enableBlend();
+                    }
+                } else {
+                    final ItemStack renderStack = out.isEmpty() ? itemStack : out;
+//                    renderStack.setCount(1);
+                    GlStateManager.enableBlend();
+                    GlStateManager.enableDepth();
+                    GlStateManager.disableRescaleNormal();
+                    GlStateManager.disableLighting();
+                    RenderHelper.disableStandardItemLighting();
+                    RenderHelper.enableStandardItemLighting();
+                    RenderHelper.enableGUIStandardItemLighting();
+                    GlStateManager.pushMatrix();
+                    RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
+                    itemRender.renderItemAndEffectIntoGUI(renderStack, pos.x + 1, pos.y + 1);
+                    itemRender.renderItemOverlayIntoGUI(Minecraft.getMinecraft().fontRenderer, renderStack, pos.x + 1, pos.y + 1,
+                            null);
+                    GlStateManager.enableAlpha();
+                    GlStateManager.popMatrix();
+                    RenderHelper.disableStandardItemLighting();
+                }
             }
-
             if (isActive()) {
                 if (slotReference instanceof ISlotWidget) {
                     if (isMouseOverElement(mouseX, mouseY)) {
@@ -210,6 +255,21 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             }
         }
     }
+
+    public static class CustomClickButtonWidget extends ClickButtonWidget {
+
+        public CustomClickButtonWidget(int xPosition, int yPosition, int width, int height, String displayText, Consumer<ClickData> onPressed) {
+            super(xPosition, yPosition, width, height, displayText, onPressed);
+        }
+
+        @Override
+        public void drawInBackground(int mouseX, int mouseY, float partialTicks, IRenderContext context) {
+            GlStateManager.translate(0, 0, 190);
+            super.drawInBackground(mouseX, mouseY, partialTicks, context);
+            GlStateManager.translate(0, 0, -190);
+        }
+    }
+}
 
 //    private class PatternConfigWidgetGroup extends AbstractWidgetGroup {
 //
@@ -303,4 +363,4 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
 //            }
 //        }
 //    }
-}
+//}

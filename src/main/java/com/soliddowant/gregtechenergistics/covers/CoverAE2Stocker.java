@@ -60,6 +60,8 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
+import gregtech.api.util.GTLog;
+import gregtech.api.util.GregFakePlayer;
 import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.common.ConfigHolder;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockPart;
@@ -235,10 +237,6 @@ public class CoverAE2Stocker extends CoverBase
 
     public void adjustLowerBoundAt(int i, int amount) {
         setLowerBoundAt(i, getLowerBoundAt(i) + amount);
-    }
-
-    public void getCircuitValueAt(int i) {
-        ghostCircuitInventory.get(i).getCircuitValue();
     }
 
     protected int getCurrentCircuitConfiguration() {
@@ -817,14 +815,16 @@ public class CoverAE2Stocker extends CoverBase
         if (meUpdateTick % ConfigHolder.compat.ae2.updateIntervals == 0) {
             getProxy().getNode().updateState();
             getAttachedAEInverntory();
+            GTLog.logger.info(this.currentStatus.toString());
             if (this.isOnline && (this.currentStatus == CoverStatus.PATTERN_NOT_INSERTED
                     || this.currentStatus == CoverStatus.FULLY_STOCKED
                     || this.currentStatus == CoverStatus.MISSING_INPUTS
                     || this.currentStatus == CoverStatus.MISSING_INPUT_SPACE)) {
-                int i = 0;
-                while (i < 9 && !hasValidPattern()) {
+                for (int i = 0; i < 9; i++) {
                     this.currentPatternIndex = (this.currentPatternIndex + 1) % 9;
-                    i++;
+                    if (hasValidPattern()) {
+                        break;
+                    }
                 }
             }
         }

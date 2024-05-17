@@ -9,6 +9,7 @@ import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.*;
 import gregtech.api.util.Position;
 import gregtech.api.util.Size;
+import gregtech.client.utils.TooltipHelper;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -53,6 +54,10 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
             patternConfigWidgetGroupSlotWidget.setVisible(false);
             this.childConfigs.add(patternConfigWidgetGroupSlotWidget);
             this.addWidget(patternConfigWidgetGroupSlotWidget);
+
+            for (AE2StockPatternSlotWidget childSlot : this.childSlots) {
+                childSlot.addLayeredWidget(patternConfigWidgetGroupSlotWidget);
+            }
         }
     }
 
@@ -194,6 +199,21 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
             Position position = getPosition();
             return super.isMouseOverElement(mouseX, mouseY) && !isMouseOver(position.x + 31, position.y + 31, 18, 18, mouseX, mouseY);
         }
+
+        private static class ScrollablePhantomSlotWidget extends PhantomSlotWidget {
+
+            public ScrollablePhantomSlotWidget(IItemHandlerModifiable itemHandler, int slotIndex, int xPosition, int yPosition) {
+                super(itemHandler, slotIndex, xPosition, yPosition);
+            }
+
+            @Override
+            public boolean mouseClicked(int mouseX, int mouseY, int button) {
+                super.mouseClicked(mouseX, mouseY, button);
+                return isMouseOverElement(mouseX, mouseY);
+            }
+        }
+
+
 
         private static class BoundaryConfigWidgetGroup extends AbstractWidgetGroup {
 
