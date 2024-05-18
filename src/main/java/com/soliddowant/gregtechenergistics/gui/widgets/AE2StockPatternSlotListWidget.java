@@ -64,6 +64,14 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
     // Unique methods
 
+    public void dropPatternAt(int i) {
+        this.parentCover.dropPatternAt(i);
+    }
+
+    public boolean getShouldBlockSlotAt(int i) {
+        return this.parentCover.getShouldBlockSlotAt(i);
+    }
+
     public int getCurrentConfigSlotIndex() {
         return this.currentConfigSlotIndex;
     }

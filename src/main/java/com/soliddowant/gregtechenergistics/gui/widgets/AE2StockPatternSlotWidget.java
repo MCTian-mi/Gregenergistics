@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
@@ -83,6 +84,14 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
         }
     }
 
+    public void dropPattern() {
+        this.parentWidget.dropPatternAt(this.index);
+    }
+
+    public boolean getShouldBlockSlot() {
+        return this.parentWidget.getShouldBlockSlotAt(this.index);
+    }
+
     public boolean hasPattern() {
         return this.patternSlotWidget.getHandle().getHasStack();
     }
@@ -133,6 +142,11 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             this.index = i;
             this.parentWidget = parentWidget;
             this.setBackgroundTexture(GuiTextures.SLOT, Textures.PATTERN_OVERLAY);
+//            this.setIsBlocked2(this::shouldBlockSlot);
+        }
+
+        public boolean shouldBlockSlot() {
+            return this.parentWidget.getShouldBlockSlot();
         }
 
         public void addLayeredWidget(Widget widget) {
@@ -149,6 +163,13 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             return false;
         }
 
+        public PatternSlotWidget setIsBlocked2(BooleanSupplier isBlocked) {
+            if (isBlocked.getAsBoolean() && this.slotReference.getHasStack()) {
+                this.parentWidget.dropPattern();
+            }
+            super.setIsBlocked(isBlocked);
+            return this;
+        }
 
         @Override
         public void onSlotChanged() {
@@ -249,6 +270,14 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
                 GlStateManager.disableDepth();
                 GlStateManager.colorMask(true, true, true, false);
                 drawSolidRect(getPosition().x + 1, getPosition().y + 1, 16, 16, 0xbf000000);
+                GlStateManager.colorMask(true, true, true, true);
+                GlStateManager.enableDepth();
+                GlStateManager.enableBlend();
+            }
+            if (shouldBlockSlot()) {
+                GlStateManager.disableDepth();
+                GlStateManager.colorMask(true, true, true, false);
+                drawSolidRect(pos.getX() + 1, pos.getY() + 1, size.getWidth() - 2, size.getHeight() - 2, 0xBFA3ABC6);
                 GlStateManager.colorMask(true, true, true, true);
                 GlStateManager.enableDepth();
                 GlStateManager.enableBlend();

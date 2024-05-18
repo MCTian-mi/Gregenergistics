@@ -29,6 +29,10 @@ import appeng.items.misc.ItemEncodedPattern;
 import appeng.me.helpers.AENetworkProxy;
 import appeng.me.helpers.IGridProxyable;
 import appeng.me.helpers.MachineSource;
+import appeng.parts.automation.StackUpgradeInventory;
+import appeng.parts.automation.UpgradeInventory;
+import appeng.util.inv.IAEAppEngInventory;
+import appeng.util.inv.InvOperation;
 import appeng.util.item.AEItemStack;
 import codechicken.lib.raytracer.CuboidRayTraceResult;
 import codechicken.lib.render.CCRenderState;
@@ -63,6 +67,7 @@ import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.util.GTLog;
 import gregtech.common.ConfigHolder;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockPart;
+import net.minecraft.block.Block;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -93,7 +98,7 @@ import java.util.stream.Collectors;
 import static gregtech.api.capability.GregtechDataCodes.UPDATE_ONLINE_STATUS;
 
 public class CoverAE2Stocker extends CoverBase
-        implements CoverWithUI, ITickable, IControllable, IGridHost, IGridProxyable, IActionHost, ICraftingRequester {
+        implements CoverWithUI, ITickable, IControllable, IGridHost, IGridProxyable, IActionHost, ICraftingRequester, IAEAppEngInventory {
 
     protected EntityPlayer placingPlayer;
     public final long maxItemsStocked = 64000;
@@ -121,7 +126,6 @@ public class CoverAE2Stocker extends CoverBase
     protected CoverStatus currentStatus;
     protected CraftingTracker craftingTracker;
     protected List<IAEItemStack> missingInputItems;
-    protected AE2UpgradeSlotWidget upgradeSlotWidget;
     protected MultiblockControllerBase controller;
 
 
@@ -142,12 +146,13 @@ public class CoverAE2Stocker extends CoverBase
     private final NonNullList<Integer> lowerBounds= NonNullList.withSize(9, 0);
     private final NonNullList<Boolean> hasFullyStocked= NonNullList.withSize(9, false);
 
+    private final UpgradeInventory upgradeInventory;
+
     protected int currentPatternIndex = 0;
 
     public CoverAE2Stocker(CoverDefinition definition, CoverableView coverable, EnumFacing attachedSide) {
         super(definition, coverable, attachedSide);
-        this.upgradeSlotWidget = new AE2UpgradeSlotWidget(Upgrades.CRAFTING);
-        this.upgradeSlotWidget.setContentsChangedCallback(wasInserted -> getCoverableView().markDirty());
+        this.upgradeInventory = new StackUpgradeInventory(this.getPickItem(), this, 4);
         this.machineActionSource = new MachineSource(this);
         this.itemChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
         this.fluidChannel = AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class);
@@ -180,6 +185,19 @@ public class CoverAE2Stocker extends CoverBase
         proxy.setIdlePowerUsage(ConfigHolder.compat.ae2.meHatchEnergyUsage); // TODO
         proxy.setValidSides(EnumSet.of(this.getAttachedSide()));
         return proxy;
+    }
+
+    public void dropPatternAt(int i) {
+        ItemStack drop = this.patternInventory.extractItem(i, 1, false);
+        Block.spawnAsEntity(this.getWorld(), this.getPos(), drop);
+    }
+
+    public boolean getShouldBlockSlotAt(int i) {
+        return switch (this.upgradeInventory.getInstalledUpgrades(Upgrades.CAPACITY)) {
+            case 0 -> i != 4;
+            case 1 -> i != 4 && i % 2 == 0;
+            default -> false;
+        };
     }
 
     protected boolean hasValidPattern() {
@@ -503,7 +521,7 @@ public class CoverAE2Stocker extends CoverBase
     @Override
     public ModularUI createUI(EntityPlayer player) {
         ModularUI.Builder builder = ModularUI
-                .builder(Textures.MUI2_BACKGROUND, 176, 192);
+                .builder(Textures.MUI2_BACKGROUND, 211, 192);
 
         WidgetGroup labelWithIcon = new WidgetGroup();
 
@@ -513,8 +531,16 @@ public class CoverAE2Stocker extends CoverBase
                 .setTooltip(this.isOnline ? I18n.format("gregtech.gui.me_network.online") :
                         I18n.format("gregtech.gui.me_network.offline")));  // TODO: does this work?
 
+        WidgetGroup upgradeSlots = new WidgetGroup();
+
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 0, 186, 7));
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 1, 186, 25));
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 2, 186, 43));
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 3, 186, 61));
+
         builder.bindPlayerInventory(player.inventory, GuiTextures.SLOT, 7, 109)
                 .widget(labelWithIcon)
+                .widget(upgradeSlots)
                 .label(8, 99, "container.inventory")
                 .widget(new AE2StockPatternSlotListWidget(this, patternInventory, 61, 29, ghostCircuitInventory, phantomStockItemInventory));
 
@@ -675,7 +701,7 @@ public class CoverAE2Stocker extends CoverBase
 //        tagCompound.setInteger("Status", currentStatus.ordinal());
         tagCompound.setBoolean("ShouldInsert", shouldInsert);
         tagCompound.setBoolean("UseFluids", useFluids);
-        tagCompound.setTag("UpgradeSlot", upgradeSlotWidget.serializeNBT());
+        tagCompound.setTag("UpgradeInventory", upgradeInventory.serializeNBT());
         tagCompound.setTag("CraftingTag", craftingTracker.serializeNBT());
         tagCompound.setTag("RemainingItems", serializeRemainingInputItems());
         tagCompound.setTag("RemainingFluids", serializeRemainingInputFluids());
@@ -730,7 +756,7 @@ public class CoverAE2Stocker extends CoverBase
         this.stockCount = tagCompound.getLong("StockCount");
         this.shouldInsert = tagCompound.getBoolean("ShouldInsert");
 //        this.currentStatus = CoverStatus.values()[tagCompound.getInteger("Status")];
-        this.upgradeSlotWidget.deserializeNBT(tagCompound.getCompoundTag("UpgradeSlot"));
+        this.upgradeInventory.deserializeNBT(tagCompound.getCompoundTag("UpgradeInventory"));
         this.craftingTracker.deserializeNBT(tagCompound.getCompoundTag("CraftingTracker"));
 
         this.meUpdateTick = tagCompound.getInteger("MeUpdateTick");
@@ -867,7 +893,7 @@ public class CoverAE2Stocker extends CoverBase
                 setWorkingStatus(true);
 
             // Order missing items
-            if (currentStatus == CoverStatus.MISSING_INPUTS && upgradeSlotWidget.hasStack())
+            if (currentStatus == CoverStatus.MISSING_INPUTS && upgradeInventory.getInstalledUpgrades(Upgrades.CRAFTING) != 0)
                 orderMissingItems();
 
             return;
@@ -1280,7 +1306,7 @@ public class CoverAE2Stocker extends CoverBase
     /// if the machine is still running from a cover.
     protected boolean areAllInputsAvailable() {
         updatePatternCaches();
-        if (!upgradeSlotWidget.hasStack()) {
+        if (upgradeInventory.getInstalledUpgrades(Upgrades.CRAFTING) == 0) {
             for (IAEItemStack inputItem : getRemainingInputItems())
                 if (!isItemAvailableForExtraction(inputItem))
                     return false;
@@ -1473,6 +1499,16 @@ public class CoverAE2Stocker extends CoverBase
     @Override
     public void jobStateChange(ICraftingLink link) {
         craftingTracker.jobStateChange(link);
+    }
+
+    @Override
+    public void saveChanges() {
+
+    }
+
+    @Override
+    public void onChangeInventory(IItemHandler iItemHandler, int i, InvOperation invOperation, ItemStack itemStack, ItemStack itemStack1) {
+
     }
 
     private static class PatternStackHandler extends ItemStackHandler {

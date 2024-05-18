@@ -24,6 +24,7 @@ public class Textures {
     public static final TextureArea BUTTON_OPEN_PATTERN_CONFIG = TextureArea.fullImage("textures/gui/widget/button_open_pattern_config.png");
     public static final TextureArea PATTERN_OVERLAY = TextureArea.fullImage("textures/gui/overlay/pattern_overlay.png");
     public static final TextureArea STOCK_OVERLAY = TextureArea.fullImage("textures/gui/overlay/stock_overlay.png");
+    public static final TextureArea AE2_UPGRADE_OVERLAY = TextureArea.fullImage("textures/gui/overlay/ae2_upgrade_overlay.png");
     public static final TextureArea STOCK_ARROW = TextureArea.fullImage("textures/gui/arrows/arrow_stocker.png");
     public static final TextureArea STOCK_CONFIG_ARROW = TextureArea.fullImage("textures/gui/arrows/int_config_stocker.png");
     public static final TextureArea AE2_STOCKER = TextureArea.fullImage("textures/items/metaitems/ae2_stocker.png");

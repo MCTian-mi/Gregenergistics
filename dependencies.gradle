@@ -51,5 +51,5 @@ dependencies {
 //    compileOnly rfg.deobf("curse.maven:crafttweaker-239197:5013567")
     compileOnly rfg.deobf("curse.maven:groovyscript-687577:5219945")
 
-    implementation rfg.deobf("curse.maven:lolasm-460609:5257348")
+//    implementation rfg.deobf("curse.maven:lolasm-460609:5257348")
 }
