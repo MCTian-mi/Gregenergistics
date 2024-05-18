@@ -64,6 +64,11 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
     }
 
     // Unique methods
+
+    public void notifySlotChanged() {
+        this.patternSlotWidget.onSlotChanged();
+    }
+
     public boolean getHasStack() {
         return this.patternSlotWidget.getHandle().getHasStack();
     }
@@ -82,10 +87,6 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             parentWidget.setConfigVisible(true, this.index);
             parentWidget.setConfigVisible(false, openedConfigIndex); // TODO
         }
-    }
-
-    public void dropPattern() {
-        this.parentWidget.dropPatternAt(this.index);
     }
 
     public boolean getShouldBlockSlot() {
@@ -142,7 +143,7 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             this.index = i;
             this.parentWidget = parentWidget;
             this.setBackgroundTexture(GuiTextures.SLOT, Textures.PATTERN_OVERLAY);
-//            this.setIsBlocked2(this::shouldBlockSlot);
+            this.setIsBlocked(this::shouldBlockSlot);
         }
 
         public boolean shouldBlockSlot() {
@@ -161,14 +162,6 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
         @Override
         public boolean canMergeSlot(ItemStack stack) {
             return false;
-        }
-
-        public PatternSlotWidget setIsBlocked2(BooleanSupplier isBlocked) {
-            if (isBlocked.getAsBoolean() && this.slotReference.getHasStack()) {
-                this.parentWidget.dropPattern();
-            }
-            super.setIsBlocked(isBlocked);
-            return this;
         }
 
         @Override
@@ -277,7 +270,7 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             if (shouldBlockSlot()) {
                 GlStateManager.disableDepth();
                 GlStateManager.colorMask(true, true, true, false);
-                drawSolidRect(pos.getX() + 1, pos.getY() + 1, size.getWidth() - 2, size.getHeight() - 2, 0xBFA3ABC6);
+                drawSolidRect(pos.getX(), pos.getY(), size.getWidth(), size.getHeight(), 0x8FA3ABC6);
                 GlStateManager.colorMask(true, true, true, true);
                 GlStateManager.enableDepth();
                 GlStateManager.enableBlend();

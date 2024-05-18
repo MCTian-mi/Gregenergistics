@@ -44,7 +44,6 @@ import com.glodblock.github.common.item.fake.FakeItemRegister;
 import com.google.common.collect.ImmutableSet;
 import com.soliddowant.gregtechenergistics.capability.impl.ItemHandlerListFixed;
 import com.soliddowant.gregtechenergistics.gui.widgets.AE2StockPatternSlotListWidget;
-import com.soliddowant.gregtechenergistics.gui.widgets.AE2UpgradeSlotWidget;
 import com.soliddowant.gregtechenergistics.helpers.CraftingTracker;
 import com.soliddowant.gregtechenergistics.render.Textures;
 import gregtech.api.capability.GregtechTileCapabilities;
@@ -55,10 +54,7 @@ import gregtech.api.capability.impl.GhostCircuitItemStackHandler;
 import gregtech.api.cover.*;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
-import gregtech.api.gui.widgets.ImageWidget;
-import gregtech.api.gui.widgets.LabelWidget;
-import gregtech.api.gui.widgets.SuppliedImageWidget;
-import gregtech.api.gui.widgets.WidgetGroup;
+import gregtech.api.gui.widgets.*;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
@@ -150,6 +146,8 @@ public class CoverAE2Stocker extends CoverBase
 
     protected int currentPatternIndex = 0;
 
+    private AE2StockPatternSlotListWidget slots;
+
     public CoverAE2Stocker(CoverDefinition definition, CoverableView coverable, EnumFacing attachedSide) {
         super(definition, coverable, attachedSide);
         this.upgradeInventory = new StackUpgradeInventory(this.getPickItem(), this, 4);
@@ -187,9 +185,13 @@ public class CoverAE2Stocker extends CoverBase
         return proxy;
     }
 
+    public void notifySlotChangedAt(int i) {
+        this.slots.notifySlotChangedAt(i);
+    }
+
     public void dropPatternAt(int i) {
-        ItemStack drop = this.patternInventory.extractItem(i, 1, false);
-        Block.spawnAsEntity(this.getWorld(), this.getPos(), drop);
+        Block.spawnAsEntity(this.getWorld(), this.getPos(), this.patternInventory.extractItem(i, 1, false));
+        notifySlotChangedAt(i);
     }
 
     public boolean getShouldBlockSlotAt(int i) {
@@ -212,6 +214,11 @@ public class CoverAE2Stocker extends CoverBase
                     && upperBounds.get(i) != 0;
         }
         return false;
+    }
+
+    protected boolean hasPatternAt(int i) {
+        ItemStack patternStack = patternInventory.getStackInSlot(i);
+        return !patternStack.isEmpty();
     }
 
     protected boolean canWork() {
@@ -533,16 +540,18 @@ public class CoverAE2Stocker extends CoverBase
 
         WidgetGroup upgradeSlots = new WidgetGroup();
 
-        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 0, 186, 7));
-        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 1, 186, 25));
-        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 2, 186, 43));
-        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(upgradeInventory, 3, 186, 61));
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(this, upgradeInventory, 0, 186, 7));
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(this, upgradeInventory, 1, 186, 25));
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(this, upgradeInventory, 2, 186, 43));
+        upgradeSlots.addWidget(new AE2UpgradeSlotWidget(this, upgradeInventory, 3, 186, 61));
+
+        this.slots = new AE2StockPatternSlotListWidget(this, patternInventory, 61, 29, ghostCircuitInventory, phantomStockItemInventory);
 
         builder.bindPlayerInventory(player.inventory, GuiTextures.SLOT, 7, 109)
                 .widget(labelWithIcon)
                 .widget(upgradeSlots)
                 .label(8, 99, "container.inventory")
-                .widget(new AE2StockPatternSlotListWidget(this, patternInventory, 61, 29, ghostCircuitInventory, phantomStockItemInventory));
+                .widget(this.slots);
 
 
         return builder.build(this, player);
@@ -842,7 +851,7 @@ public class CoverAE2Stocker extends CoverBase
         if (meUpdateTick % ConfigHolder.compat.ae2.updateIntervals == 0) {
             getProxy().getNode().updateState();
             getAttachedAEInverntory();
-            GTLog.logger.info(this.currentStatus.toString());
+//            GTLog.logger.info(this.currentStatus.toString());
             if (this.isOnline && (this.currentStatus == CoverStatus.PATTERN_NOT_INSERTED
                     || this.currentStatus == CoverStatus.FULLY_STOCKED
                     || this.currentStatus == CoverStatus.MISSING_INPUTS
@@ -1521,6 +1530,31 @@ public class CoverAE2Stocker extends CoverBase
         public int getSlotLimit(int slot)
         {
             return 1;
+        }
+    }
+
+    public static class AE2UpgradeSlotWidget extends SlotWidget {
+
+        private final CoverAE2Stocker parentCover;
+
+        public AE2UpgradeSlotWidget(CoverAE2Stocker parentCover, UpgradeInventory upgradeInventory, int slotIndex, int xPosition, int yPosition) {
+            super(upgradeInventory, slotIndex, xPosition, yPosition);
+            this.setBackgroundTexture(GuiTextures.SLOT, Textures.AE2_UPGRADE_OVERLAY);
+            this.parentCover = parentCover;
+        }
+        // TODO: modify transferStackInSlot method in ModularUIContainer
+
+        @Override
+        public void onSlotChanged() {
+            super.onSlotChanged();
+            if (this.slotReference.getHasStack()) {
+                return;
+            }
+            for (int i = 0; i < 9; i++) {
+                if (this.parentCover.hasPatternAt(i) && parentCover.getShouldBlockSlotAt(i)) {
+                    parentCover.dropPatternAt(i);
+                }
+            }
         }
     }
 }
