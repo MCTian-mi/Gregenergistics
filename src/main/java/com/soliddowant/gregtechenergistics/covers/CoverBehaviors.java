@@ -7,7 +7,7 @@ import static gregtech.common.covers.CoverBehaviors.registerBehavior;
 
 public class CoverBehaviors {
 	public static void init() {
-		registerBehavior(gregtechId("ae2.interface"), GEMetaItem.AE2_STOCKER,
+		registerBehavior(gregtechId("ae2.stocker"), GEMetaItem.AE2_STOCKER,
                 CoverAE2Stocker::new);
 	}
 }

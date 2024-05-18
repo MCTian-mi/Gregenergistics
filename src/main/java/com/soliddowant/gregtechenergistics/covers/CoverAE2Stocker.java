@@ -45,7 +45,7 @@ import com.google.common.collect.ImmutableSet;
 import com.soliddowant.gregtechenergistics.capability.impl.ItemHandlerListFixed;
 import com.soliddowant.gregtechenergistics.gui.widgets.AE2StockPatternSlotListWidget;
 import com.soliddowant.gregtechenergistics.helpers.CraftingTracker;
-import com.soliddowant.gregtechenergistics.render.Textures;
+import com.soliddowant.gregtechenergistics.render.GETextures;
 import gregtech.api.capability.GregtechTileCapabilities;
 import gregtech.api.capability.IControllable;
 import gregtech.api.capability.IGhostSlotConfigurable;
@@ -60,7 +60,6 @@ import gregtech.api.metatileentity.multiblock.IMultiblockPart;
 import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
-import gregtech.api.util.GTLog;
 import gregtech.common.ConfigHolder;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockPart;
 import net.minecraft.block.Block;
@@ -78,6 +77,8 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -156,7 +157,6 @@ public class CoverAE2Stocker extends CoverBase
         this.fluidChannel = AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class);
         this.craftingTracker = new CraftingTracker(this, machineActionSource);
         this.meUpdateTick = 0;
-
 
         for (int i = 0; i < 9; i++) {
             ghostCircuitInventory.add(new GhostCircuitItemStackHandler((MetaTileEntity) this.getCoverableView()));
@@ -491,12 +491,13 @@ public class CoverAE2Stocker extends CoverBase
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void renderCover(@NotNull CCRenderState renderState, @NotNull Matrix4 translation,
                             IVertexOperation[] pipeline, @NotNull Cuboid6 plateBox, @NotNull BlockRenderLayer layer) {
         if (this.isOnline) {
-            Textures.STOCKER_COVER_ACTIVE.renderSided(getAttachedSide(), plateBox, renderState, pipeline, translation);
+            GETextures.STOCKER_COVER_ACTIVE.renderSided(this.getAttachedSide(), plateBox, renderState, pipeline, translation);
         } else {
-            Textures.STOCKER_COVER_INACTIVE.renderSided(getAttachedSide(), plateBox, renderState, pipeline, translation);
+            GETextures.STOCKER_COVER_INACTIVE.renderSided(this.getAttachedSide(), plateBox, renderState, pipeline, translation);
         }
     }
 
@@ -528,13 +529,13 @@ public class CoverAE2Stocker extends CoverBase
     @Override
     public ModularUI createUI(EntityPlayer player) {
         ModularUI.Builder builder = ModularUI
-                .builder(Textures.MUI2_BACKGROUND, 211, 192);
+                .builder(GETextures.MUI2_BACKGROUND, 211, 192);
 
         WidgetGroup labelWithIcon = new WidgetGroup();
 
-        labelWithIcon.addWidget(new ImageWidget(4, 4, 16, 16, Textures.AE2_STOCKER));
+        labelWithIcon.addWidget(new ImageWidget(4, 4, 16, 16, GETextures.AE2_STOCKER));
         labelWithIcon.addWidget(new LabelWidget(24, 8, I18n.format("metaitem.ae2_stocker.name")));
-        labelWithIcon.addWidget(new SuppliedImageWidget(156, 4, 16, 16, () -> this.isOnline ? (Textures.STOCKER_ONLINE) : (Textures.STOCKER_OFFLINE))
+        labelWithIcon.addWidget(new SuppliedImageWidget(156, 4, 16, 16, () -> this.isOnline ? (GETextures.STOCKER_ONLINE) : (GETextures.STOCKER_OFFLINE))
                 .setTooltip(this.isOnline ? I18n.format("gregtech.gui.me_network.online") :
                         I18n.format("gregtech.gui.me_network.offline")));  // TODO: does this work?
 
@@ -1539,7 +1540,7 @@ public class CoverAE2Stocker extends CoverBase
 
         public AE2UpgradeSlotWidget(CoverAE2Stocker parentCover, UpgradeInventory upgradeInventory, int slotIndex, int xPosition, int yPosition) {
             super(upgradeInventory, slotIndex, xPosition, yPosition);
-            this.setBackgroundTexture(GuiTextures.SLOT, Textures.AE2_UPGRADE_OVERLAY);
+            this.setBackgroundTexture(GuiTextures.SLOT, GETextures.AE2_UPGRADE_OVERLAY);
             this.parentCover = parentCover;
         }
         // TODO: modify transferStackInSlot method in ModularUIContainer

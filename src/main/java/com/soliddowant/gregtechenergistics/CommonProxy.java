@@ -1,7 +1,6 @@
 package com.soliddowant.gregtechenergistics;
 
 import appeng.api.config.Upgrades;
-import appeng.api.definitions.IItemDefinition;
 import com.soliddowant.gregtechenergistics.covers.CoverBehaviors;
 import com.soliddowant.gregtechenergistics.items.GEMetaItem;
 import com.soliddowant.gregtechenergistics.items.GEMetaItems;
@@ -9,7 +8,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 @Mod.EventBusSubscriber(modid = GregTechEnergisticsMod.MODID)
 public class CommonProxy {

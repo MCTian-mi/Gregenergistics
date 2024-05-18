@@ -3,7 +3,7 @@ package com.soliddowant.gregtechenergistics.gui.widgets;
 import appeng.items.misc.ItemEncodedPattern;
 import com.glodblock.github.common.item.ItemFluidDrop;
 import com.glodblock.github.common.item.fake.FakeItemRegister;
-import com.soliddowant.gregtechenergistics.render.Textures;
+import com.soliddowant.gregtechenergistics.render.GETextures;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.IRenderContext;
 import gregtech.api.gui.Widget;
@@ -30,7 +30,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
@@ -49,13 +48,13 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
 
         // Create the pattern slot widget
         this.patternSlotWidget = new PatternSlotWidget(slotIndex, this, itemHandler, slotIndex, 0, 0, true, true); // TODO
-        this.patternSlotWidget.setBackgroundTexture(GuiTextures.SLOT, Textures.PATTERN_OVERLAY);
+        this.patternSlotWidget.setBackgroundTexture(GuiTextures.SLOT, GETextures.PATTERN_OVERLAY);
         this.addWidget(this.patternSlotWidget);
 
         // Create the config button
         this.configButton = new CustomClickButtonWidget(12, 0, 6, 6, "", clickData -> {
             this.toggleConfigVisible();
-        }).setButtonTexture(Textures.BUTTON_OPEN_PATTERN_CONFIG).setShouldClientCallback(true);
+        }).setButtonTexture(GETextures.BUTTON_OPEN_PATTERN_CONFIG).setShouldClientCallback(true);
         this.configButton.setVisible(false);
         this.addWidget(this.configButton);
 
@@ -142,7 +141,7 @@ public class AE2StockPatternSlotWidget extends AbstractWidgetGroup {
             super(itemHandler, slotIndex, xPosition, yPosition, canTakeItems, canPutItems);
             this.index = i;
             this.parentWidget = parentWidget;
-            this.setBackgroundTexture(GuiTextures.SLOT, Textures.PATTERN_OVERLAY);
+            this.setBackgroundTexture(GuiTextures.SLOT, GETextures.PATTERN_OVERLAY);
             this.setIsBlocked(this::shouldBlockSlot);
         }
 

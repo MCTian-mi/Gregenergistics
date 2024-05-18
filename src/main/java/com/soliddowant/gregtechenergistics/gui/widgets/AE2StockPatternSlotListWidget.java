@@ -4,7 +4,7 @@ import com.glodblock.github.common.item.ItemFluidDrop;
 import com.glodblock.github.common.item.fake.FakeFluids;
 import com.glodblock.github.common.item.fake.FakeItemRegister;
 import com.soliddowant.gregtechenergistics.covers.CoverAE2Stocker;
-import com.soliddowant.gregtechenergistics.render.Textures;
+import com.soliddowant.gregtechenergistics.render.GETextures;
 import gregtech.api.capability.impl.GhostCircuitItemStackHandler;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.IRenderContext;
@@ -12,11 +12,12 @@ import gregtech.api.gui.Widget;
 import gregtech.api.gui.impl.ModularUIGui;
 import gregtech.api.gui.resources.IGuiTexture;
 import gregtech.api.gui.widgets.*;
-import gregtech.api.util.*;
+import gregtech.api.util.FluidTooltipUtil;
+import gregtech.api.util.Position;
+import gregtech.api.util.Size;
 import gregtech.client.utils.RenderUtil;
 import gregtech.client.utils.TooltipHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
@@ -40,8 +41,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
-
-import static gregtech.api.gui.widgets.TankWidget.addIngotMolFluidTooltip;
 
 public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
@@ -167,9 +166,9 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
 
             //
-            this.addWidget(new ImageWidget(0, 0, 80, 80, Textures.MUI2_PATTERN_CONFIG_BACKGROUND));
-            this.addWidget(new ImageWidget(24, 33, 7, 14, Textures.STOCK_CONFIG_ARROW));
-            this.addWidget(new ImageWidget(50, 37, 5, 6, Textures.STOCK_ARROW));
+            this.addWidget(new ImageWidget(0, 0, 80, 80, GETextures.MUI2_PATTERN_CONFIG_BACKGROUND));
+            this.addWidget(new ImageWidget(24, 33, 7, 14, GETextures.STOCK_CONFIG_ARROW));
+            this.addWidget(new ImageWidget(50, 37, 5, 6, GETextures.STOCK_ARROW));
 
             //
             this.circuitSlotWidget = new GhostCircuitSlotWidget(circuitInventory, 0, 6, 31);
@@ -179,7 +178,7 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
             //
             this.stockSlotWidget = new FixedPhantomSlotWidget(ghostItemHandler, i, 56, 31);
-            this.stockSlotWidget.setBackgroundTexture(GuiTextures.SLOT, Textures.STOCK_OVERLAY).setTooltipText("gregtech.gui.pattern_stock_item.tooltip");
+            this.stockSlotWidget.setBackgroundTexture(GuiTextures.SLOT, GETextures.STOCK_OVERLAY).setTooltipText("gregtech.gui.pattern_stock_item.tooltip");
             this.addWidget(this.stockSlotWidget);
 
             //
@@ -398,7 +397,7 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
                 public TextlessIncrementButtonWidget(int x, int y, int width, int height, boolean isIncreaseButton, IntConsumer updater) {
                     super(x, y, width, height, isIncreaseButton ? 1 : -1, isIncreaseButton ? 16 : -16, isIncreaseButton ? 32 : -32, isIncreaseButton ? 64 : -64, updater);
-                    this.setButtonTexture(isIncreaseButton ? Textures.BUTTON_ANGLE_R : Textures.BUTTON_ANGLE_L).setTextScale(0F).setDefaultTooltip().setShouldClientCallback(false);
+                    this.setButtonTexture(isIncreaseButton ? GETextures.BUTTON_ANGLE_R : GETextures.BUTTON_ANGLE_L).setTextScale(0F).setDefaultTooltip().setShouldClientCallback(false);
                 }
             }
         }
