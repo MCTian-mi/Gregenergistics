@@ -239,6 +239,7 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
                         slotReference.putStack(ItemStack.EMPTY);
                         writeClientAction(2, buf -> {
                         });
+                        return true;
                     } else {
                         ItemStack is = gui.entityPlayer.inventory.getItemStack().copy();
                         is.setCount(1);
@@ -255,6 +256,7 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
                             buffer.writeVarInt(mouseButton);
                             buffer.writeBoolean(shiftDown);
                         });
+                        return true;
                     }
                 }
                 return false;
