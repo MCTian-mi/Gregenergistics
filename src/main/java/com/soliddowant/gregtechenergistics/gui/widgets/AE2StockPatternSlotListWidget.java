@@ -18,6 +18,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
 import java.util.function.IntConsumer;
@@ -151,7 +152,7 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
             this.addWidget(this.circuitSlotWidget);
 
             //
-            this.stockSlotWidget = new PhantomSlotWidget(ghostItemHandler, i, 56, 31);
+            this.stockSlotWidget = new FixedPhantomSlotWidget(ghostItemHandler, i, 56, 31);
             this.stockSlotWidget.setBackgroundTexture(GuiTextures.SLOT, Textures.STOCK_OVERLAY).setTooltipText("gregtech.gui.pattern_stock_item.tooltip");
             this.addWidget(this.stockSlotWidget);
 
@@ -200,16 +201,32 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
             return super.isMouseOverElement(mouseX, mouseY) && !isMouseOver(position.x + 31, position.y + 31, 18, 18, mouseX, mouseY);
         }
 
-        private static class ScrollablePhantomSlotWidget extends PhantomSlotWidget {
+        private static class FixedPhantomSlotWidget extends PhantomSlotWidget {
 
-            public ScrollablePhantomSlotWidget(IItemHandlerModifiable itemHandler, int slotIndex, int xPosition, int yPosition) {
+            public FixedPhantomSlotWidget(IItemHandlerModifiable itemHandler, int slotIndex, int xPosition, int yPosition) {
                 super(itemHandler, slotIndex, xPosition, yPosition);
             }
 
             @Override
             public boolean mouseClicked(int mouseX, int mouseY, int button) {
-                super.mouseClicked(mouseX, mouseY, button);
-                return isMouseOverElement(mouseX, mouseY);
+                if (isMouseOverElement(mouseX, mouseY) && gui != null) {
+                    if (button == 1 && !slotReference.getStack().isEmpty()) {
+                        slotReference.putStack(ItemStack.EMPTY);
+                        writeClientAction(2, buf -> {});
+                    } else {
+                        ItemStack is = gui.entityPlayer.inventory.getItemStack().copy();
+                        is.setCount(1);
+                        slotReference.putStack(is);
+                        writeClientAction(1, buffer -> {
+                            buffer.writeItemStack(slotReference.getStack());
+                            int mouseButton = Mouse.getEventButton();
+                            boolean shiftDown = TooltipHelper.isShiftDown();
+                            buffer.writeVarInt(mouseButton);
+                            buffer.writeBoolean(shiftDown);
+                        });
+                    }
+                }
+                return false;
             }
         }
 

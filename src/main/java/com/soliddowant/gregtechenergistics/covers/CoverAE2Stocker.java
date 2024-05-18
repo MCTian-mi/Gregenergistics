@@ -61,8 +61,6 @@ import gregtech.api.metatileentity.multiblock.MultiblockAbility;
 import gregtech.api.metatileentity.multiblock.MultiblockControllerBase;
 import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.util.GTLog;
-import gregtech.api.util.GregFakePlayer;
-import gregtech.client.renderer.texture.cube.SimpleOverlayRenderer;
 import gregtech.common.ConfigHolder;
 import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityMultiblockPart;
 import net.minecraft.client.resources.I18n;
@@ -137,12 +135,12 @@ public class CoverAE2Stocker extends CoverBase
     protected boolean isOnline = false;
     private AENetworkProxy aeProxy;
 
-    private PatternStackHandler patternInventory = new PatternStackHandler(9);
-    private ItemStackHandler phantomstockItemInventory = new ItemStackHandler(9);
-    private NonNullList<GhostCircuitItemStackHandler> ghostCircuitInventory = NonNullList.create();
-    private NonNullList<Integer> upperBounds= NonNullList.withSize(9, 0);
-    private NonNullList<Integer> lowerBounds= NonNullList.withSize(9, 0);
-    private NonNullList<Boolean> hasFullyStocked= NonNullList.withSize(9, false);
+    private final PatternStackHandler patternInventory = new PatternStackHandler(9);
+    private final ItemStackHandler phantomStockItemInventory = new ItemStackHandler(9);
+    private final NonNullList<GhostCircuitItemStackHandler> ghostCircuitInventory = NonNullList.create();
+    private final NonNullList<Integer> upperBounds= NonNullList.withSize(9, 0);
+    private final NonNullList<Integer> lowerBounds= NonNullList.withSize(9, 0);
+    private final NonNullList<Boolean> hasFullyStocked= NonNullList.withSize(9, false);
 
     protected int currentPatternIndex = 0;
 
@@ -185,11 +183,15 @@ public class CoverAE2Stocker extends CoverBase
     }
 
     protected boolean hasValidPattern() {
-        ItemStack patternStack = patternInventory.getStackInSlot(currentPatternIndex);
+        return hasValidPatternAt(currentPatternIndex);
+    }
+
+    protected boolean hasValidPatternAt(int i) {
+        ItemStack patternStack = patternInventory.getStackInSlot(i);
         if (!patternStack.isEmpty()) {
             return ((ItemEncodedPattern) patternStack.getItem()).getPatternForItem(patternStack, getWorld()) != null
-                    && !phantomstockItemInventory.getStackInSlot(currentPatternIndex).isEmpty()
-                    && upperBounds.get(currentPatternIndex) != 0;
+                    && !phantomStockItemInventory.getStackInSlot(i).isEmpty()
+                    && upperBounds.get(i) != 0;
         }
         return false;
     }
@@ -199,7 +201,7 @@ public class CoverAE2Stocker extends CoverBase
     }
 
     public void clearDataAt(int i) {
-        phantomstockItemInventory.setStackInSlot(i, ItemStack.EMPTY);
+        phantomStockItemInventory.setStackInSlot(i, ItemStack.EMPTY);
         ghostCircuitInventory.get(i).setCircuitValue(GhostCircuitItemStackHandler.NO_CONFIG);
         upperBounds.set(i, 0);
         lowerBounds.set(i, 0);
@@ -289,7 +291,7 @@ public class CoverAE2Stocker extends CoverBase
     }
 
     protected ItemStack getStockItemStack() {
-        return phantomstockItemInventory.getStackInSlot(currentPatternIndex);
+        return phantomStockItemInventory.getStackInSlot(currentPatternIndex);
     }
 
     protected int getStockedAmount() {
@@ -514,7 +516,7 @@ public class CoverAE2Stocker extends CoverBase
         builder.bindPlayerInventory(player.inventory, GuiTextures.SLOT, 7, 109)
                 .widget(labelWithIcon)
                 .label(8, 99, "container.inventory")
-                .widget(new AE2StockPatternSlotListWidget(this, patternInventory, 61, 29, ghostCircuitInventory, phantomstockItemInventory));
+                .widget(new AE2StockPatternSlotListWidget(this, patternInventory, 61, 29, ghostCircuitInventory, phantomStockItemInventory));
 
 
         return builder.build(this, player);
@@ -680,7 +682,7 @@ public class CoverAE2Stocker extends CoverBase
 
         tagCompound.setInteger("MeUpdateTick", meUpdateTick);
         tagCompound.setTag("PatternHandler", patternInventory.serializeNBT());
-        tagCompound.setTag("PhantomStock", phantomstockItemInventory.serializeNBT());
+        tagCompound.setTag("PhantomStock", phantomStockItemInventory.serializeNBT());
         tagCompound.setInteger("CurrentPatternIndex", currentPatternIndex);
         for (int i = 0; i < 9; i++) {
             tagCompound.setByte("GhostCircuit" + i, (byte) ghostCircuitInventory.get(i).getCircuitValue());
@@ -733,7 +735,7 @@ public class CoverAE2Stocker extends CoverBase
 
         this.meUpdateTick = tagCompound.getInteger("MeUpdateTick");
         this.patternInventory.deserializeNBT(tagCompound.getCompoundTag("PatternHandler"));
-        this.phantomstockItemInventory.deserializeNBT(tagCompound.getCompoundTag("PhantomStock"));
+        this.phantomStockItemInventory.deserializeNBT(tagCompound.getCompoundTag("PhantomStock"));
         this.currentPatternIndex = tagCompound.getInteger("CurrentPatternIndex");
         for (int i = 0; i < 9; i++) {
             this.ghostCircuitInventory.get(i).setCircuitValue(tagCompound.getByte("GhostCircuit" + i));
@@ -791,7 +793,6 @@ public class CoverAE2Stocker extends CoverBase
         this.meUpdateTick = buf.readInt();
         this.isOnline = buf.readBoolean();
     }
-
 
     @Override
     public void readCustomData(int dataId, PacketBuffer buf) {
