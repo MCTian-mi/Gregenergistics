@@ -1,19 +1,33 @@
 package com.soliddowant.gregtechenergistics.gui.widgets;
 
+import com.glodblock.github.common.item.ItemFluidDrop;
+import com.glodblock.github.common.item.fake.FakeFluids;
+import com.glodblock.github.common.item.fake.FakeItemRegister;
 import com.soliddowant.gregtechenergistics.covers.CoverAE2Stocker;
 import com.soliddowant.gregtechenergistics.render.Textures;
 import gregtech.api.capability.impl.GhostCircuitItemStackHandler;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.IRenderContext;
 import gregtech.api.gui.Widget;
+import gregtech.api.gui.impl.ModularUIGui;
+import gregtech.api.gui.resources.IGuiTexture;
 import gregtech.api.gui.widgets.*;
-import gregtech.api.util.Position;
-import gregtech.api.util.Size;
+import gregtech.api.util.*;
+import gregtech.client.utils.RenderUtil;
 import gregtech.client.utils.TooltipHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -21,8 +35,13 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
+
+import static gregtech.api.gui.widgets.TankWidget.addIngotMolFluidTooltip;
 
 public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
@@ -128,7 +147,6 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
 
     // Overrides
 
-
     private static class PatternConfigWidgetGroup extends AbstractWidgetGroup {
 
         protected AE2StockPatternSlotListWidget parentWidget;
@@ -190,18 +208,18 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
             GlStateManager.translate(0, 0, -200);
         }
 
-        @Override
-        @SideOnly(Side.CLIENT)
-        public boolean mouseClicked(int mouseX, int mouseY, int button) {
-            if (super.mouseClicked(mouseX, mouseY, button)) {
-                return true;
-            }
-            boolean result = this.isMouseOverElement(mouseX, mouseY);
-            if (!result) {
-                this.parentWidget.setConfigVisible(false, this.parentWidget.currentConfigSlotIndex);
-            }
-            return result;
-        }
+//        @Override
+//        @SideOnly(Side.CLIENT)
+//        public boolean mouseClicked(int mouseX, int mouseY, int button) {
+//            if (super.mouseClicked(mouseX, mouseY, button)) {
+//                return true;
+//            }
+//            boolean result = this.isMouseOverElement(mouseX, mouseY);
+//            if (!result) {
+//                this.parentWidget.setConfigVisible(false, this.parentWidget.currentConfigSlotIndex);
+//            }
+//            return result;
+//        }
 
         @Override
         public boolean isMouseOverElement(int mouseX, int mouseY) {
@@ -220,10 +238,16 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
                 if (isMouseOverElement(mouseX, mouseY) && gui != null) {
                     if (button == 1 && !slotReference.getStack().isEmpty()) {
                         slotReference.putStack(ItemStack.EMPTY);
-                        writeClientAction(2, buf -> {});
+                        writeClientAction(2, buf -> {
+                        });
                     } else {
                         ItemStack is = gui.entityPlayer.inventory.getItemStack().copy();
                         is.setCount(1);
+                        if (is.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                            IFluidHandlerItem itemTank = Objects.requireNonNull(
+                                    is.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null));
+                            is = FakeFluids.packFluid2Drops(itemTank.drain(1000, true));
+                        }
                         slotReference.putStack(is);
                         writeClientAction(1, buffer -> {
                             buffer.writeItemStack(slotReference.getStack());
@@ -236,9 +260,109 @@ public class AE2StockPatternSlotListWidget extends AbstractWidgetGroup {
                 }
                 return false;
             }
+
+            @Override
+            public void drawInForeground(int mouseX, int mouseY) {
+                ItemStack itemStack = slotReference.getStack();
+                if (itemStack.getItem() instanceof ItemFluidDrop) {
+                    FluidStack fluidStack = FakeItemRegister.getStack(itemStack);
+                    if (!gui.isJEIHandled && isMouseOverElement(mouseX, mouseY)) {
+                        List<String> tooltips = new ArrayList<>();
+                        if (fluidStack != null) {
+                            Fluid fluid = fluidStack.getFluid();
+                            tooltips.add(fluid.getLocalizedName(fluidStack));
+
+                            // Add various tooltips from the material
+                            List<String> formula = FluidTooltipUtil.getFluidTooltip(fluidStack);
+                            if (formula != null) {
+                                for (String s : formula) {
+                                    if (s.isEmpty()) continue;
+                                    tooltips.add(s);
+                                }
+                            }
+                            drawHoveringText(ItemStack.EMPTY, tooltips, 300, mouseX, mouseY);
+                            GlStateManager.color(1.0f, 1.0f, 1.0f);
+                            return;
+                        }
+                    }
+                }
+                super.drawInForeground(mouseX, mouseY);
+            }
+
+            @Override
+            @SideOnly(Side.CLIENT)
+            public void drawInBackground(int mouseX, int mouseY, float partialTicks, IRenderContext context) {
+                Position pos = getPosition();
+                Size size = getSize();
+                if (backgroundTexture != null) {
+                    for (IGuiTexture backgroundTexture : this.backgroundTexture) {
+                        backgroundTexture.draw(pos.x, pos.y, size.width, size.height);
+                    }
+                }
+                ItemStack itemStack = slotReference.getStack();
+                ModularUIGui modularUIGui = gui == null ? null : gui.getModularUIGui();
+                if (itemStack.isEmpty() && modularUIGui != null && modularUIGui.getDragSplitting() &&
+                        modularUIGui.getDragSplittingSlots().contains(slotReference)) { // draw split
+                    int splitSize = modularUIGui.getDragSplittingSlots().size();
+                    itemStack = gui.entityPlayer.inventory.getItemStack();
+                    if (!itemStack.isEmpty() && splitSize > 1 && Container.canAddItemToSlot(slotReference, itemStack, true)) {
+                        itemStack = itemStack.copy();
+                        Container.computeStackSize(modularUIGui.getDragSplittingSlots(), modularUIGui.dragSplittingLimit,
+                                itemStack, slotReference.getStack().isEmpty() ? 0 : slotReference.getStack().getCount());
+                        int k = Math.min(itemStack.getMaxStackSize(), slotReference.getItemStackLimit(itemStack));
+                        if (itemStack.getCount() > k) {
+                            itemStack.setCount(k);
+                        }
+                    }
+                }
+                if (!itemStack.isEmpty()) {
+                    if (itemStack.getItem() instanceof ItemFluidDrop) {
+                        FluidStack fluidStack = FakeItemRegister.getStack(itemStack);
+                        if (fluidStack != null) {
+                            GlStateManager.disableBlend();
+                            RenderUtil.drawFluidForGui(fluidStack, fluidStack.amount, pos.x + 1, pos.y + 1, size.width - 1,
+                                    size.height - 1);
+                            GlStateManager.enableBlend();
+                        }
+                    } else {
+                        GlStateManager.enableBlend();
+                        GlStateManager.enableDepth();
+                        GlStateManager.disableRescaleNormal();
+                        GlStateManager.disableLighting();
+                        RenderHelper.disableStandardItemLighting();
+                        RenderHelper.enableStandardItemLighting();
+                        RenderHelper.enableGUIStandardItemLighting();
+                        GlStateManager.pushMatrix();
+                        RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
+                        itemRender.renderItemAndEffectIntoGUI(itemStack, pos.x + 1, pos.y + 1);
+                        itemRender.renderItemOverlayIntoGUI(Minecraft.getMinecraft().fontRenderer, itemStack, pos.x + 1, pos.y + 1,
+                                null);
+                        GlStateManager.enableAlpha();
+                        GlStateManager.popMatrix();
+                        RenderHelper.disableStandardItemLighting();
+                    }
+                }
+                if (isActive()) {
+                    if (slotReference instanceof ISlotWidget) {
+                        if (isMouseOverElement(mouseX, mouseY)) {
+                            GlStateManager.disableDepth();
+                            GlStateManager.colorMask(true, true, true, false);
+                            drawSolidRect(getPosition().x + 1, getPosition().y + 1, 16, 16, -2130706433);
+                            GlStateManager.colorMask(true, true, true, true);
+                            GlStateManager.enableDepth();
+                            GlStateManager.enableBlend();
+                        }
+                    }
+                } else {
+                    GlStateManager.disableDepth();
+                    GlStateManager.colorMask(true, true, true, false);
+                    drawSolidRect(getPosition().x + 1, getPosition().y + 1, 16, 16, 0xbf000000);
+                    GlStateManager.colorMask(true, true, true, true);
+                    GlStateManager.enableDepth();
+                    GlStateManager.enableBlend();
+                }
+            }
         }
-
-
 
         private static class BoundaryConfigWidgetGroup extends AbstractWidgetGroup {
 
